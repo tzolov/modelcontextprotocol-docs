@@ -763,7 +763,7 @@ For manual MCP Server implementation, refer to the [MCP Server Java SDK document
 
 ### Set up your environment
 
-Use the [Spring Initizer](https://start.spring.io/) to bootstrat a the [application skeleton](https://start.spring.io/#!type=maven-project&language=java&platformVersion=3.4.2&packaging=jar&jvmVersion=17&groupId=com.example.mcp.server&artifactId=weather&name=weather&description=Demo%20project%20for%20Spring%20Boot&packageName=com.example.mcp.server.weather&dependencies=spring-ai-anthropic,webflux).
+Use the [Spring Initizer](https://start.spring.io/) to bootstrat the project.
 
 You will need to add the following dependencies:
 
@@ -820,7 +820,7 @@ Now let's dive into building your server.
 
 ### Weather Service
 
-Let's implement a weather service that uses a REST client to query the data from the National Weather Service API:
+Let's implement a [WeatheService.java](https://github.com/spring-projects/spring-ai-examples/blob/main/model-context-protocol/weather/starter-stdio-server/src/main/java/org/springframework/ai/mcp/sample/server/WeatherService.java) that uses a REST client to query the data from the National Weather Service API:
 
 ```java
 @Service
@@ -879,13 +879,13 @@ public class McpServerApplication {
 	}
 
 	@Bean
-	public List<ToolCallback> weatherTools(WeatherService weatherService) {
-		return List.of(ToolCallbacks.from(weatherService));
+	public ToolCallbackProvider weatherTools(WeatherService weatherService) {
+		return  MethodToolCallbackProvider.builder().toolObjects(weatherService).build();
 	}
 }
 ```
 
-Uses the the `ToolCallbacks.from(...)` utils to convert the `@Tools` into actionalble callbackes used by the MCP server.
+Uses the the `MethodToolCallbackProvider` utils to convert the `@Tools` into actionalble callbackes used by the MCP server.
 
 ### Running the server
 
@@ -940,7 +940,7 @@ In this case, we'll add our single weather server like so:
       "spring-ai-mcp-weather": {
         "command": "java",
         "args": [
-          "-Dspring.ai.mcp.server.transport=STDIO",
+          "-Dspring.ai.mcp.server.stdio=true",
           "-jar",
           "/ABSOLUTE/PATH/TO/PARENT/FOLDER/mcp-weather-stdio-server-0.0.1-SNAPSHOT.jar"
         ]
